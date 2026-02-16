@@ -83,16 +83,21 @@ app.get('/api/books/:id', (req, res) => {
 
 // POST /api/books - Add a new book
 app.post('/api/books', (req, res) => {
-    // Extract data from request body
+    // Reject empty request bodies with 400 (validation)
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res.status(400).json({ error: 'Request body required' });
+    }
+
+    // Safely extract data from request body
     const { title, author, genre, copiesAvailable } = req.body;
-  
-  	// Create new book with generated ID
+
+    // Create new book with generated ID (fields may be undefined)
     const newBook = {
         id: books.length + 1,
-        title,
-        author,
-        genre,
-        copiesAvailable
+        title: title,
+        author: author,
+        genre: genre,
+        copiesAvailable: copiesAvailable
     };
   
     // Add to books array

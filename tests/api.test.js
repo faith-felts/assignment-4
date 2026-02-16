@@ -126,5 +126,25 @@ describe('Books API', () => {
 		// Other properties are removed/undefined because the server replaces the object
 		expect(res.body.author).toBeUndefined();
 	});
+
+	// Edge: requests that omit the `:id` segment should not match the id-based routes
+	// DELETE without an id should return 404 (no matching route)
+	test('DELETE without id returns 404', async () => {
+		const res = await request(app).delete('/api/books');
+		expect(res.statusCode).toBe(404);
+	});
+
+	// PUT without an id should return 404 as well
+	test('PUT without id returns 404', async () => {
+		const res = await request(app).put('/api/books').send({ title: 'x' });
+		expect(res.statusCode).toBe(404);
+	});
+
+	// POST with no body: server should return 400 (validation) when body is empty
+	test('POST /api/books with no body returns 400', async () => {
+		const res = await request(app).post('/api/books');
+		expect(res.statusCode).toBe(400);
+		expect(res.body).toHaveProperty('error', 'Request body required');
+	});
 });
 
