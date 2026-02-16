@@ -43,10 +43,9 @@ let books = [
     // Add more books if you'd like!
 ];
 
-// Start the server
-app.listen(port, () => {
-    console.log(`Book API server running at http://localhost:${port}`);
-});
+// Keep an immutable snapshot of the initial books so tests can reset state
+const initialBooks = JSON.parse(JSON.stringify(books));
+
 
 
 // Root endpoint - API homepage
@@ -145,3 +144,18 @@ app.delete('/api/books/:id', (req, res) => {
     // Return the deleted book
     res.json({ message: 'Book deleted successfully', book: deletedBook });
 });
+
+// Only start server when running directly, not when testing
+if (require.main === module) {
+    app.listen(port, () => {
+         console.log(`API server running at
+    http://localhost:${port}`);
+    });
+}
+
+// Helper for tests: reset books to initial state
+app.resetBooks = () => {
+    books = JSON.parse(JSON.stringify(initialBooks));
+};
+
+module.exports = app;
